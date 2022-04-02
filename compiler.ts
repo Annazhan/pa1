@@ -1,4 +1,4 @@
-import { Stmt, Expr } from "./ast";
+import { Stmt, Expr, BinaryOp } from "./ast";
 import { parse } from "./parser";
 
 // https://learnxinyminutes.com/docs/wasm/
@@ -53,5 +53,24 @@ function codeGenExpr(expr : Expr) : Array<string> {
       return ["(i32.const " + expr.value + ")"];
     case "id":
       return [`(local.get $${expr.name})`];
+    case "biryExpr":
+      const leftExpr = codeGenExpr(expr.left);
+      const rightExpr = codeGenExpr(expr.right);
+      const op = codeGenOp(expr.op);
+      return [...leftExpr, ...rightExpr, op];
   }
+}
+
+function codeGenOp(op: BinaryOp): string{
+  switch(op){
+    case BinaryOp.Plus:
+      return "(i32.add)";
+    case BinaryOp.Minus:
+      return "(i32.sub)";
+    case BinaryOp.Mul:
+      return "(i32.mul)";
+    default:
+      throw new Error("COMPILE ERROR: unknown binary operator");
+  }
+    
 }

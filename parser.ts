@@ -17,6 +17,9 @@ export function traverseExpr(c : TreeCursor, s : string) : Expr {
     case "CallExpression":
       c.firstChild();
       const callName = s.substring(c.from, c.to);
+      if (callName != "print" && callName != "abs"){
+        throw new Error("PARSE ERROR: unknown buildin1")
+      }
       c.nextSibling(); // go to arglist
       c.firstChild(); // go into arglist
       c.nextSibling(); // find single argument in arglist
