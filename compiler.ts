@@ -9,6 +9,8 @@ type CompileResult = {
   wasmSource: string,
 };
 
+var globalVars = new Set();
+
 export function compile(source: string) : CompileResult {
   const ast = parse(source);
   const definedVars = new Set();
@@ -19,6 +21,7 @@ export function compile(source: string) : CompileResult {
         break;
     }
   }); 
+  globalVars = definedVars;
   const scratchVar : string = `(local $$last i32)`;
   const localDefines = [scratchVar];
   definedVars.forEach(v => {
@@ -55,6 +58,9 @@ function codeGenExpr(expr : Expr) : Array<string> {
     case "num":
       return ["(i32.const " + expr.value + ")"];
     case "id":
+      if (!globalVars.has(expr.name)){
+        throw new Error(`REFERENCE ERROR: undefine variables ${expr.name}`);
+      }
       return [`(local.get $${expr.name})`];
     case "biryExpr":
       const leftExpr = codeGenExpr(expr.left);
