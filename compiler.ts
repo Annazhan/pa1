@@ -49,6 +49,9 @@ function codeGenExpr(expr : Expr) : Array<string> {
     case "builtin1":
       const argStmts = codeGenExpr(expr.arg);
       return argStmts.concat([`(call $${expr.name})`]);
+    case "builtin2":
+      const argExprs = expr.args.map((e) => codeGenExpr(e));
+      return [].concat.apply([], argExprs).concat([`(call $${expr.name})`]);
     case "num":
       return ["(i32.const " + expr.value + ")"];
     case "id":
@@ -58,6 +61,7 @@ function codeGenExpr(expr : Expr) : Array<string> {
       const rightExpr = codeGenExpr(expr.right);
       const op = codeGenOp(expr.op);
       return [...leftExpr, ...rightExpr, op];
+
   }
 }
 

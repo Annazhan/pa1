@@ -2,6 +2,17 @@ import {parser} from "lezer-python";
 import {TreeCursor} from "lezer-tree";
 import {BinaryOp, Expr, Stmt} from "./ast";
 
+export function traverseArglist(c: TreeCursor, s:string): Array<Expr>{
+  c.firstChild(); // go into arglist
+  const argList = [];
+  while (c.nextSibling()){
+    argList.push(traverseExpr(c, s));
+    c.nextSibling();
+  }
+  c.parent(); // pop arglist
+  return argList;
+}
+
 export function traverseExpr(c : TreeCursor, s : string) : Expr {
   switch(c.type.name) {
     case "Number":
@@ -17,19 +28,31 @@ export function traverseExpr(c : TreeCursor, s : string) : Expr {
     case "CallExpression":
       c.firstChild();
       const callName = s.substring(c.from, c.to);
-      if (callName != "print" && callName != "abs"){
-        throw new Error("PARSE ERROR: unknown buildin1")
-      }
       c.nextSibling(); // go to arglist
-      c.firstChild(); // go into arglist
-      c.nextSibling(); // find single argument in arglist
-      const arg = traverseExpr(c, s);
-      c.parent(); // pop arglist
+      const argList = traverseArglist(c, s);
       c.parent(); // pop CallExpression
-      return {
-        tag: "builtin1",
-        name: callName,
-        arg: arg
+      if (argList.length == 1){
+        if (callName != "print" && callName != "abs"){
+          throw new Error("PARSE ERROR: unknown buildin1");
+        }
+        return {
+          tag: "builtin1",
+          name: callName,
+          arg: argList[0]
+        }
+      } 
+      else if (argList.length == 2){
+        if (callName != "max" && callName != "min" && callName != "pow"){
+          throw new Error("PARSE ERROR: unknown buildin2");
+        }
+        return {
+          tag: "builtin2",
+          name: callName,
+          args: argList
+        }
+      }
+      else{
+        throw new Error("PARSE ERROR: known call function");
       }
       case "UnaryExpression":
         c.firstChild();
