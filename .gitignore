@@ -5,5 +5,6 @@ cli
 dist
 debug.ts
 treeprinter.ts
+.DS_Store
 *.json
 *.sw*
