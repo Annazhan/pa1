@@ -8,12 +8,12 @@ export function traverseExpr(c : TreeCursor, s : string) : Expr {
       return {
         tag: "num",
         value: Number(s.substring(c.from, c.to))
-      }
+      };
     case "VariableName":
       return {
         tag: "id",
         name: s.substring(c.from, c.to)
-      }
+      };
     case "CallExpression":
       c.firstChild();
       const callName = s.substring(c.from, c.to);
@@ -31,6 +31,27 @@ export function traverseExpr(c : TreeCursor, s : string) : Expr {
         name: callName,
         arg: arg
       }
+      case "UnaryExpression":
+        c.firstChild();
+        var op : BinaryOp;
+        // console.log(s.substring(c.from, c.to));
+        switch(s.substring(c.from, c.to)){
+          case "+":
+            op = BinaryOp.Plus;
+            break;
+          case "-":
+            op = BinaryOp.Minus;
+            break;
+          default:
+            throw new Error("PARSE ERROR: unknown unary operator")
+        }
+        c.nextSibling()
+        const value = traverseExpr(c, s); 
+        c.parent();
+        return {tag: "biryExpr", op:op, left: {
+            tag: "num",
+            value: Number(0)
+          }, right: value};
       case "BinaryExpression":
         c.firstChild();
         const left = traverseExpr(c, s);
