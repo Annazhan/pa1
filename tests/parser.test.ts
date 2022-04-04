@@ -159,13 +159,13 @@ describe('parse(source) function', () => {
   });  
 
   it('parses the whole code', () => {
-    const source = "x=4\nprint(x)";
+    const source = "x=-4\nprint(x)";
     const parsed = parse(source);
 
     // Note: we have to use deep equality when comparing objects
     expect(parsed).to.deep.equal([{tag: "define", name: "x", value:{
       tag: "num",
-      value: 4
+      value: -4
     }},
     {
       tag: "expr", expr:{

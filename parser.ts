@@ -56,25 +56,21 @@ export function traverseExpr(c : TreeCursor, s : string) : Expr {
       }
       case "UnaryExpression":
         c.firstChild();
-        var op : BinaryOp;
+        const UnaryOp  = s.substring(c.from, c.to);
         // console.log(s.substring(c.from, c.to));
-        switch(s.substring(c.from, c.to)){
-          case "+":
-            op = BinaryOp.Plus;
-            break;
-          case "-":
-            op = BinaryOp.Minus;
-            break;
-          default:
-            throw new Error("PARSE ERROR: unknown unary operator")
+        if (UnaryOp != "-" && UnaryOp != "+"){
+          throw new Error("PARSE ERROR: not a number");
         }
         c.nextSibling()
-        const value = traverseExpr(c, s); 
+        const value = Number("-"+s.substring(c.from, c.to));
+        if(isNaN(value)){
+          throw new Error("PARSE ERROR: not a number");
+        }
         c.parent();
-        return {tag: "biryExpr", op:op, left: {
-            tag: "num",
-            value: Number(0)
-          }, right: value};
+        return {
+          tag: "num",
+          value: value
+        };
       case "BinaryExpression":
         c.firstChild();
         const left = traverseExpr(c, s);
