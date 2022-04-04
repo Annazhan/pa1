@@ -9,17 +9,31 @@ type CompileResult = {
   wasmSource: string,
 };
 
-var globalVars = new Set();
+// var globalVars = new Set();
 
 export function compile(source: string) : CompileResult {
   const ast = parse(source);
-  
-  const commandGroups = ast.map((stmt) => codeGen(stmt));
+  const definedVars = new Set();
+  ast.forEach(s => {
+    switch(s.tag) {
+      case "define":
+        definedVars.add(s.name);
+        break;
+    }
+  });
+
   const scratchVar : string = `(local $$last i32)`;
   const localDefines = [scratchVar];
-  globalVars.forEach(v => {
+  definedVars.forEach(v => {
     localDefines.push(`(local $${v} i32)`);
   })
+  
+  const commandGroups = ast.map((stmt) => codeGen(stmt));
+  // const scratchVar : string = `(local $$last i32)`;
+  // const localDefines = [scratchVar];
+  // // globalVars.forEach(v => {
+  // //   localDefines.push(`(local $${v} i32)`);
+  // // })
   const commands = localDefines.concat([].concat.apply([], commandGroups));
   console.log("Generated: ", commands.join("\n"));
   return {
@@ -31,7 +45,7 @@ function codeGen(stmt: Stmt) : Array<string> {
   switch(stmt.tag) {
     case "define":
       var valStmts = codeGenExpr(stmt.value);
-      globalVars.add(stmt.name);
+      // globalVars.add(stmt.name);
       return valStmts.concat([`(local.set $${stmt.name})`]);
     case "expr":
       var exprStmts = codeGenExpr(stmt.expr);
@@ -49,13 +63,13 @@ function codeGenExpr(expr : Expr) : Array<string> {
       return [].concat.apply([], argExprs).concat([`(call $${expr.name})`]);
     case "num":
       if ( expr.value <  -2147483648 || expr.value > 2147483647){
-        throw new Error(`CompileError: ${expr.value} is oeverflow`)
+        throw new Error(`CompileError: ${expr.value} is overflow`)
       }
       return ["(i32.const " + expr.value + ")"];
     case "id":
-      if (!globalVars.has(expr.name)){
-        throw new Error(`ReferenceError: undefine variables ${expr.name}`);
-      }
+      // if (!globalVars.has(expr.name)){
+      //   throw new Error(`ReferenceError: undefine variables ${expr.name}`);
+      // }
       return [`(local.get $${expr.name})`];
     case "biryExpr":
       const leftExpr = codeGenExpr(expr.left);

@@ -205,10 +205,11 @@ describe('parse(source) function', () => {
         }
       }
     }]);
+  });
 
     // these 2 are the test functions, above are all helpers
   it('parses 10000 random valid expression', ()=>{
-    for(let i=0;i<3;i++){
+    for(let i=0;i<10000;i++){
       var source = getRandomValidExpression()
       const cursor = parser.parse(source).cursor();
       // go to statement
@@ -230,12 +231,15 @@ describe('parse(source) function', () => {
         cursor.firstChild();
         traverseExpr(cursor, source);
       }catch(e){
-        if(!e.message.includes("ParseError")){
+          if(!e.message.includes("ParseError")){
           expect(1).to.deep.equal(2)
+        }
+        else{
+          expect(1).to.deep.equal(1)
         }
       }
     }
   });
-});
+  
   // TODO: add additional tests here to ensure parse works as expected
 });
