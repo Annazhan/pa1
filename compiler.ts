@@ -49,12 +49,12 @@ function codeGenExpr(expr : Expr) : Array<string> {
       return [].concat.apply([], argExprs).concat([`(call $${expr.name})`]);
     case "num":
       if ( expr.value <  -2147483648 || expr.value > 2147483647){
-        throw new Error(`COMPILER ERROR: ${expr.value} is oeverflow`)
+        throw new Error(`CompileError: ${expr.value} is oeverflow`)
       }
       return ["(i32.const " + expr.value + ")"];
     case "id":
       if (!globalVars.has(expr.name)){
-        throw new Error(`REFERENCE ERROR: undefine variables ${expr.name}`);
+        throw new Error(`ReferenceError: undefine variables ${expr.name}`);
       }
       return [`(local.get $${expr.name})`];
     case "biryExpr":
@@ -75,7 +75,7 @@ function codeGenOp(op: BinaryOp): string{
     case BinaryOp.Mul:
       return "(i32.mul)";
     default:
-      throw new Error("COMPILE ERROR: unknown binary operator");
+      throw new Error("CompileError: unknown binary operator");
   }
     
 }

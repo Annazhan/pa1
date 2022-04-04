@@ -67,5 +67,61 @@ describe('run(source, config) function', () => {
     expect(result).to.equal(5);
   });
 
+  it('adds two numbers', async() => {
+    const result = await run("2 + 3", config);
+    expect(result).to.equal(5);
+  });
+  it("add three numbers", async() => {
+    const result = await run("1+2+3",config);
+    expect(result).to.equal(6);
+  });
+  
+  it("subtracts two numbers", async() => {
+    const result = await run("2-1",config);
+    expect(result).to.equal(1);
+  });
+
+  it("add & multiply three numbers", async() => {
+    const result = await run("2- 1*3",config);
+    expect(result).to.equal(-1);
+  });
+
+  it("abs with computed result two numbers", async() => {
+    const result = await run("abs(2- 4*5)",config);
+    expect(result).to.equal(18);
+  });
+
+  it("print abs with computed result two numbers", async() => {
+    const result = await run("print(abs(2- 4*5))",config);
+    expect(result).to.equal(18);
+    expect(config.importObject.output).to.equal("18\n");
+  
+  });
+
+  it("pow two numbers", async() => {
+    const result = await run("pow(7,2)",config);
+    expect(result).to.equal(49);
+  });
+
+  it("max two numbers", async() => {
+    const result = await run("max(4,2)",config);
+    expect(result).to.equal(4);
+  });
+
+  it("min two numbers", async() => {
+    const result = await run("min(3,9)",config);
+    expect(result).to.equal(3);
+  });
+
+  it("print builtin 2 function",async() => {
+    const result = await run("print(max(4,2))",config);
+    expect(config.importObject.output).to.equal("4\n");
+  });
+  
+  it("complex single operation", async() => {
+    const result = await run("max(pow(2,4),max(4-3,200))",config);
+    expect(result).to.equal(200);
+  })
+
   // TODO: add additional tests here to ensure the compiler runs as expected
 });
