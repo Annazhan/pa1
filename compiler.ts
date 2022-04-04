@@ -48,9 +48,9 @@ function codeGenExpr(expr : Expr) : Array<string> {
       const argExprs = expr.args.map((e) => codeGenExpr(e));
       return [].concat.apply([], argExprs).concat([`(call $${expr.name})`]);
     case "num":
-      if ( expr.value <  -2147483648 || expr.value > 2147483647){
-        throw new Error(`CompileError: ${expr.value} is overflow`)
-      }
+      // if ( expr.value <  -2147483648 || expr.value > 2147483647){
+      //   throw new Error(`CompileError: ${expr.value} is overflow`)
+      // }
       return ["(i32.const " + expr.value + ")"];
     case "id":
       if (!globalVars.has(expr.name)){
