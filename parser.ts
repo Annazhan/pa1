@@ -16,9 +16,10 @@ export function traverseArglist(c: TreeCursor, s:string): Array<Expr>{
 export function traverseExpr(c : TreeCursor, s : string) : Expr {
   switch(c.type.name) {
     case "Number":
+      const val = parseInt(s.substring(c.from, c.to));
       return {
         tag: "num",
-        value: Number(s.substring(c.from, c.to))
+        value: val
       };
     case "VariableName":
       return {
